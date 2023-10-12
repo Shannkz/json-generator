@@ -1,0 +1,92 @@
+{
+  "users": [
+    {
+      "user": "perf_user100",
+      "login": "perf_user100",
+      "connect": "perf_user100",
+      "wait_login_response": "perf_user100",
+      "test_recovery": false,
+      "delay_between_two_tests": 5217,
+      "tests": [
+        {
+          "template": [
+            "trade1",
+            "126",
+            "cancel_immediate",
+            "15",
+            "amend_immediate",
+            "10"
+          ],
+          "within": "1000",
+          "repeat": "5"
+        }
+      ]
+    },
+    {
+      "user": "perf_user200",
+      "login": "perf_user200",
+      "connect": "perf_user200",
+      "wait_login_response": "perf_user200",
+      "test_recovery": true,
+      "delay_between_two_tests": 5982,
+      "tests": [
+        {
+          "template": [
+            "trade1",
+            "175",
+            "cancel_immediate",
+            "13",
+            "amend_immediate",
+            "10"
+          ],
+          "within": "1000",
+          "repeat": "9"
+        }
+      ]
+    },
+    {
+      "user": "perf_user300",
+      "login": "perf_user300",
+      "connect": "perf_user300",
+      "wait_login_response": "perf_user300",
+      "test_recovery": false,
+      "delay_between_two_tests": 5570,
+      "tests": [
+        {
+          "template": [
+            "trade1",
+            "119",
+            "cancel_immediate",
+            "16",
+            "amend_immediate",
+            "10"
+          ],
+          "within": "1000",
+          "repeat": "4"
+        }
+      ]
+    },
+    {
+      "user": "perf_user400",
+      "login": "perf_user400",
+      "connect": "perf_user400",
+      "wait_login_response": "perf_user400",
+      "test_recovery": false,
+      "delay_between_two_tests": 5104,
+      "tests": [
+        {
+          "template": [
+            "trade1",
+            "160",
+            "cancel_immediate",
+            "19",
+            "amend_immediate",
+            "10"
+          ],
+          "within": "1000",
+          "repeat": "1"
+        }
+      ]
+    }
+  ]
+}
