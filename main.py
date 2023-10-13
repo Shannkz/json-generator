@@ -21,19 +21,39 @@ parser.add_argument('json_template', metavar='FILE')
 
 CLI_ARGUMENTS = parser.parse_args()
 
+TEST_BLOCK_TEMPLATES = {
+    1: [
+        'trade1',
+        100,
+        'cancel_immediate',
+        0,
+        'amend_immediate',
+        0
+    ],
+    2: [
+        'reconnect'
+    ],
+    3: [
+        'full_recovery'
+    ],
+    4: [
+        'recovery'
+    ]
+}
+
 
 ############
 # UTILITIES
-def merge_dicts(dict1, dict2):
+def merge_dicts(dict1: dict, dict2: dict) -> dict:
     res = {**dict1, **dict2}
     return res
 
 
-def is_valid_file(parser, arg):
-    if not os.path.exists(arg):
-        parser.error("The file %s does not exist!" % arg)
-    else:
-        return open(arg, 'r')
+# def is_valid_file(parser, arg):
+#     if not os.path.exists(arg):
+#         parser.error("The file %s does not exist!" % arg)
+#     else:
+#         return open(arg, 'r')
 
 
 ########
@@ -93,30 +113,70 @@ class ValueHandler:
         self.args = vars(CLI_ARGUMENTS)
 
     def create_template(self) -> dict:
-        self.generate_values()
+        self._generate_values()
 
         template = {
             'test_recovery': random.choice([True, False]),
             'delay_between_two_tests': self.generated_args['delay_value'],
+            'reset_seq_numbers_on_logon': random.choice([True, False]),
             'tests': [
+            ]
+        }
+
+        test_blocks = self.create_test_blocks(random.randint(1, 5))
+        template.get('tests').extend(test_blocks)
+
+        return template
+
+    def create_test_blocks(self, number_of_blocks: int) -> list:
+        OPTIONAL_FIELDS = {
+            'trade1': {
+                'run_full_recovery_test': random.choice([True, False]),  # trade1
+                'run_recovery_with_range': random.randint(1, 10),  # trade1
+            },
+            'reconnect': {
+                'reset_seq_numbers_on_logon': random.choice([True, False]),  # reconnect
+            },
+            'recovery': {
+                'seq_num_range': random.randint(1, 10)  # recovery
+            }
+        }
+
+        # Add extra options in the template based on the test type
+        test_blocks = list()
+        keys_list = list(TEST_BLOCK_TEMPLATES.keys())
+
+        for i in range(number_of_blocks):
+            # Generate random values for each iteration
+            self._generate_values()
+
+            # Initialize empty test template block
+            test_block = [
                 {
-                    'template': [
-                        'trade1',
-                        str(self.generated_args['trade_value']),
-                        'cancel_immediate',
-                        str(self.generated_args['cancel_immediate']),
-                        'amend_immediate',
-                        str(self.generated_args['amend_immediate'])
-                    ],
+                    'template': [],
                     'within': self.generated_args['within_value'],
                     'repeat': self.generated_args['repeat']
                 }
             ]
-        }
 
-        return template
+            # Get a random value from the block template
+            random_key = random.choice(keys_list)
+            random_value = TEST_BLOCK_TEMPLATES[random_key]
 
-    def generate_values(self) -> None:
+            # Based on the random value, add the optional_fields
+            if 'trade1' in random_value:
+                test_block[0].update(OPTIONAL_FIELDS.get('trade1'))
+            elif 'reconnect' in random_value:
+                test_block[0].update(OPTIONAL_FIELDS.get('reconnect'))
+            elif 'recovery' in random_value:
+                test_block[0].update(OPTIONAL_FIELDS.get('recovery'))
+
+            test_block[0]['template'].extend(random_value)
+            test_blocks.extend(test_block)
+
+        return test_blocks
+
+    def _generate_values(self) -> None:
         self._collect_arguments()
 
         for key, value in self.args.items():
@@ -147,8 +207,11 @@ class ValueHandler:
 def setup():
     # Initialize the Value Handler object
     value_handler = ValueHandler()
-    value_handler.generate_values()
+    # value_handler.generate_values()
+    # a = value_handler.create_test_blocks(3)
+    # print(a)
     value_handler.generate_random_user()
+    value_handler.create_template()
 
     # Initialize the JSON randomizer object
     json_worker = JsonRandomizer(CLI_ARGUMENTS.json_template)
